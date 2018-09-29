@@ -1,0 +1,1 @@
+self:place_item('stonehearth:trees:oak:ancient', -45, z)
