@@ -1,4 +1,4 @@
-local MicroWorld = require 'microworld.micro_world'
+local MicroWorld = require 'refuge.micro_world'
 local HarvestTest = class(MicroWorld)
 
 function HarvestTest:__init()

@@ -6,7 +6,7 @@ local MicroWorld = require 'micro_world'
 local DataDriven = class(MicroWorld)
 
 function DataDriven:__init()
-   local index_reference = radiant.util.get_config('data_driven_index', 'microworld:data_driven:world:mini_game')
+   local index_reference = radiant.util.get_config('data_driven_index', 'refuge:data_driven:world:mini_game')
    self._config = radiant.resources.load_json(index_reference)
    
    -- World Creation

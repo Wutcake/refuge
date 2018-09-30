@@ -1,7 +1,7 @@
 {
    "info" :{
-      "name" : "Microworld",
-      "namespace": "microworld",
+      "name" : "Refuge",
+      "namespace": "refuge",
       "is_debug_mod": true,
       "client_only": true,
       "version" : 3

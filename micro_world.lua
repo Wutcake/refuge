@@ -7,7 +7,7 @@ local Point3 = _radiant.csg.Point3
 local Cube3 = _radiant.csg.Cube3
 local Region3 = _radiant.csg.Region3
 
-local log = radiant.log.create_logger('microworld')
+local log = radiant.log.create_logger('refuge')
 
 function MicroWorld:__init(size, height)
    self._nextTime = 1
@@ -65,7 +65,7 @@ function MicroWorld:create_world(kingdom, biome)
 end
 
 function MicroWorld:at(time, fn)
-   return radiant.set_realtime_timer("MicroWorld at", time, fn)
+   return radiant.set_realtime_timer("Refuge at", time, fn)
 end
 
 function MicroWorld:place_tree(x, z)
