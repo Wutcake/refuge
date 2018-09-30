@@ -1,0 +1,66 @@
+local Color4 = _radiant.csg.Color4
+
+local farming_service = stonehearth.farming
+local validator = radiant.validator
+
+local BuildingCallHandler = class()
+
+-- runs on the client!!
+function BuildingCallHandler:choose_new_field_location(session, response)
+   stonehearth.selection:select_designation_region(stonehearth.constants.xz_region_reasons.NEW_FIELD)
+      :set_max_size(11)
+      :use_designation_marquee(Color4(55, 187, 56, 255))
+      :set_cursor('stonehearth:cursors:zone_farm')
+      :set_find_support_filter(stonehearth.selection.valid_terrain_blocks_only_xz_region_support_filter({
+            grass = true,
+            dirt = true
+         }))
+
+      :done(function(selector, box)
+            local size = {
+               x = box.max.x - box.min.x,
+               y = box.max.z - box.min.z,
+            }
+            _radiant.call('stonehearth:create_new_field', box.min, size)
+                     :done(function(r)
+                           response:resolve({ field = r.field })
+                        end)
+                     :always(function()
+                           selector:destroy()
+                        end)
+         end)
+      :fail(function(selector)
+            selector:destroy()
+            response:reject('no region')
+         end)
+      :go()
+end
+
+-- runs on the server!
+function BuildingCallHandler:create_new_field(session, response, location, size)
+   validator.expect_argument_types({'Point3', 'table'}, location, size)
+   validator.expect.num.range(size.x, 1, 11)
+   validator.expect.num.range(size.y, 1, 11)
+
+   local entity = stonehearth.farming:create_new_field(session, location, size)
+   return { field = entity }
+end
+
+--TODO: Send an array of soil_plots and the type of the crop for batch planting
+function BuildingCallHandler:plant_crop(session, response, soil_plot, crop_type, player_specified, auto_plant, auto_harvest)
+   validator.expect_argument_types({validator.any_type(), 'string', 'boolean', 'boolean', 'boolean'}, soil_plot, crop_type, player_specified, auto_plant, auto_harvest)
+   --TODO: remove this when we actually get the correct data from the UI
+   local soil_plots = {soil_plot}
+   if not crop_type then
+      crop_type = 'stonehearth:crops:turnip_crop'
+   end
+
+   return farming_service:plant_crop(session.player_id, soil_plots, crop_type, player_speficied, auto_plant, auto_harvest, true)
+end
+
+--- Returns the crops available for planting to this player
+function BuildingCallHandler:get_all_crops(session)
+   return {all_crops = farming_service:get_all_crop_types(session)}
+end
+
+return BuildingCallHandler
