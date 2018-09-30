@@ -1,15 +1,30 @@
 local Color4 = _radiant.csg.Color4
 
-local farming_service = stonehearth.farming
+local building_service = stonehearth.building
 local validator = radiant.validator
 
 local BuildingCallHandler = class()
+
+
+function StockpileCallHandler:set_stockpile_filter(session, response, storage_entity, filter)
+   if radiant.entities.is_entity(storage_entity) then
+      validator.expect_argument_types({validator.optional('table')}, filter)
+      validator.expect.matching_player_id(session.player_id, storage_entity)
+      local storage_component = storage_entity:get_component('stonehearth:storage')
+      assert(storage_component)
+      storage_component:set_filter(filter)
+   end
+   return true
+end
+
+return StockpileCallHandler
+
 
 -- runs on the client!!
 function BuildingCallHandler:choose_new_field_location(session, response)
    stonehearth.selection:select_designation_region(stonehearth.constants.xz_region_reasons.NEW_FIELD)
       :set_max_size(11)
-      :use_designation_marquee(Color4(55, 187, 56, 255))
+      :use_designation_marquee(Color4(255, 255, 255, 255))
       :set_cursor('stonehearth:cursors:zone_farm')
       :set_find_support_filter(stonehearth.selection.valid_terrain_blocks_only_xz_region_support_filter({
             grass = true,
@@ -55,12 +70,12 @@ function BuildingCallHandler:plant_crop(session, response, soil_plot, crop_type,
       crop_type = 'stonehearth:crops:turnip_crop'
    end
 
-   return farming_service:plant_crop(session.player_id, soil_plots, crop_type, player_speficied, auto_plant, auto_harvest, true)
+   return building_service:plant_crop(session.player_id, soil_plots, crop_type, player_speficied, auto_plant, auto_harvest, true)
 end
 
 --- Returns the crops available for planting to this player
 function BuildingCallHandler:get_all_crops(session)
-   return {all_crops = farming_service:get_all_crop_types(session)}
+   return {all_crops = building_service:get_all_crop_types(session)}
 end
 
 return BuildingCallHandler
